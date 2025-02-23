@@ -17,9 +17,9 @@ EventManager::~EventManager() {
     }
 }
 
-Node* EventManager::getMiddle(Node* head) {
-    Node* slow = head;
-    Node* fast = head->next;
+Node* EventManager::getMiddle(Node* currentHead) {
+    Node* slow = currentHead;
+    Node* fast = currentHead->next;
     
     while (fast != nullptr && fast->next != nullptr) {
         slow = slow->next;
@@ -61,10 +61,10 @@ Node* EventManager::getTail(Node* cur) {
     return cur;
 }
 
-Node* EventManager::partition(Node* head, Node*& newHead, Node*& newEnd) {
-    Node* pivot = head;
+Node* EventManager::partition(Node* pivotNode, Node*& newHead, Node*& newEnd) {
+    Node* pivot = pivotNode;
     Node* prev = nullptr;
-    Node* cur = head;
+    Node* cur = pivotNode;
     Node* tail = pivot;
     
     while (cur != nullptr) {
@@ -90,13 +90,13 @@ Node* EventManager::partition(Node* head, Node*& newHead, Node*& newEnd) {
     return pivot;
 }
 
-Node* EventManager::quickSortRec(Node* head, Node* end) {
-    if (!head || head == end) return head;
+Node* EventManager::quickSortRec(Node* currentHead, Node* end) {
+    if (!currentHead || currentHead == end) return currentHead;
     
     Node* newHead = nullptr;
     Node* newEnd = nullptr;
     
-    Node* pivot = partition(head, newHead, newEnd);
+    Node* pivot = partition(currentHead, newHead, newEnd);
     
     if (newHead != pivot) {
         Node* tmp = newHead;
