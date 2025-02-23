@@ -1,5 +1,6 @@
 // main.cpp
 #include "EventManager.hpp"
+#include "HardcodedEvents.hpp"
 #include "Utils.hpp"
 #include <iostream>
 #include <string>
@@ -7,7 +8,7 @@
 int main() {
     EventManager manager;
     manager.loadEventsFromFile();
-    
+    createHardcodedEvents(manager);
     std::string choice;
     while (true) {
         manager.displayMenu();
@@ -22,11 +23,8 @@ int main() {
         }
 
         switch (choice[0]) {
+            
             case '1':
-                manager.scheduleEvent();
-                break;
-
-            case '2':
                 manager.displayEvents();
                 std::cout << "Press Enter to continue...";
                 {
@@ -35,31 +33,31 @@ int main() {
                 }
                 break;
 
-            case '3':
+            case '2':
                 manager.sortByDate();
                 break;
 
-            case '4':
+            case '3':
                 manager.sortByName();
                 break;
 
-            case '5':
+            case '4':
                 manager.searchEventByID();
                 break;
 
-            case '6':
+            case '5':
                 manager.approveEvent();
                 break;
 
-            case '7':
+            case '6':
                 manager.editEventByID();
                 break;
 
-            case '8':
+            case '7':
                 manager.deleteEventByID();
                 break;
 
-            case '9':
+            case '8':
                 clearScreen();
                 std::cout << "\n+=======================================+\n"
                           << "| Exiting Event Scheduling System...    |\n"

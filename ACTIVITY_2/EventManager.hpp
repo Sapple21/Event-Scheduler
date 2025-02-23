@@ -33,7 +33,9 @@ public:
     void displayEvents() const;
     void displayEvent(const Event& e) const;
     void displayMenu() const;
-    void scheduleEvent();
+    void scheduleEvent(const std::string& eventID, const std::string& name, 
+                       const std::string& date, const std::string& time, 
+                       const std::string& organizer, bool approved = false); 
     void sortByDate();
     void sortByName();
     void searchEventByID();

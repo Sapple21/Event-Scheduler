@@ -235,75 +235,47 @@ void EventManager::displayMenu() const {
     std::cout << "\n+=======================================+" << std::endl;
     std::cout << "|       Event Scheduling System         |" << std::endl;
     std::cout << "+=======================================+" << std::endl;
-    std::cout << "| 1. Schedule a New Event              |" << std::endl;
-    std::cout << "| 2. View All Events                   |" << std::endl;
-    std::cout << "| 3. Sort Events by Date (Merge Sort)  |" << std::endl;
-    std::cout << "| 4. Sort Events by Name (Quick Sort)  |" << std::endl;
-    std::cout << "| 5. Search Event by ID                |" << std::endl;
-    std::cout << "| 6. Approve an Event                  |" << std::endl;
-    std::cout << "| 7. Edit Event by ID                  |" << std::endl;
-    std::cout << "| 8. Delete Event by ID                |" << std::endl;
-    std::cout << "| 9. Exit                              |" << std::endl;
+    std::cout << "| 1. View All Events                   |" << std::endl;
+    std::cout << "| 2. Sort Events by Date (Merge Sort)  |" << std::endl;
+    std::cout << "| 3. Sort Events by Name (Quick Sort)  |" << std::endl;
+    std::cout << "| 4. Search Event by ID                |" << std::endl;
+    std::cout << "| 5. Approve an Event                  |" << std::endl;
+    std::cout << "| 6. Edit Event by ID                  |" << std::endl;
+    std::cout << "| 7. Delete Event by ID                |" << std::endl;
+    std::cout << "| 8. Exit                              |" << std::endl;
     std::cout << "+=======================================+" << std::endl;
     std::cout << "Please enter your choice (1-9): ";
 }
 
-void EventManager::scheduleEvent() {
-    std::string input;
-    
-    clearScreen();
-    std::cout << "\n+==== Schedule a New Event ====+ " << std::endl;
-    std::cout << "Enter Event ID (e.g., E001): ";
-    std::getline(std::cin, input);
-    
+void EventManager::scheduleEvent(const std::string& eventID, const std::string& name, 
+                               const std::string& date, const std::string& time, 
+                               const std::string& organizer, bool approved) {
+
     Node* current = head;
     while (current != nullptr) {
-        if (current->event.getEventID() == input) {
-            std::cout << "ERROR: Event ID '" << input << "' already exists!" << std::endl;
-            std::cout << "Press Enter to continue...";
-            std::getline(std::cin, input);
+        if (current->event.getEventID() == eventID) {
+            std::cout << "ERROR: Event ID '" << eventID << "' already exists!" << std::endl;
             return;
         }
         current = current->next;
     }
 
-    std::string eventID = input;
-    std::string name, date, time, organizer;
 
-    std::cout << "Enter Event Name: ";
-    std::getline(std::cin, name);
-
-    std::cout << "Enter Date (YYYY-MM-DD): ";
-    std::getline(std::cin, date);
-    if (!isValidDate(date)) {
-        std::cout << "ERROR: Invalid date format! Use YYYY-MM-DD." << std::endl;
-        std::cout << "Press Enter to continue...";
-        std::getline(std::cin, input);
+    if (!isValidDate(date) || !isValidTime(time)) {
+        std::cout << "ERROR: Invalid date or time format for event '" << eventID << "'!" << std::endl;
         return;
     }
 
-    std::cout << "Enter Time (HH:MM, 24-hour): ";
-    std::getline(std::cin, time);
-    if (!isValidTime(time)) {
-        std::cout << "ERROR: Invalid time format! Use HH:MM." << std::endl;
-        std::cout << "Press Enter to continue...";
-        std::getline(std::cin, input);
-        return;
-    }
 
-    std::cout << "Enter Organizer Name: ";
-    std::getline(std::cin, organizer);
-
-    Event newEvent(eventID, name, date, time, organizer, false); // Use constructor
+    Event newEvent(eventID, name, date, time, organizer, approved);
     Node* newNode = new Node(newEvent);
     newNode->next = head;
     head = newNode;
     eventCount++;
-    
+
+
     logEvent("Added", newEvent);
     std::cout << "\nSUCCESS: Event '" << newEvent.getName() << "' scheduled!" << std::endl;
-    std::cout << "Press Enter to continue...";
-    std::getline(std::cin, input);
 }
 
 void EventManager::sortByDate() {
