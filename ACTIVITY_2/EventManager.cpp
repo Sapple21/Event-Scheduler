@@ -61,61 +61,75 @@ Node* EventManager::getTail(Node* cur) {
     return cur;
 }
 
-Node* EventManager::partition(Node* pivotNode, Node*& newHead, Node*& newEnd) {
-    Node* pivot = pivotNode;
-    Node* prev = nullptr;
-    Node* cur = pivotNode;
-    Node* tail = pivot;
-    
+Node* EventManager::partition(Node* head, Node*& newHead, Node*& newEnd) {
+    Node* pivot = head; 
+    Node* cur = head->next; 
+    Node* lessHead = nullptr; 
+    Node* lessTail = nullptr; 
+    Node* greaterHead = nullptr; 
+    Node* greaterTail = nullptr; 
+
+ 
     while (cur != nullptr) {
-        if (compareNames(cur->event.getName(), pivot->event.getName())) {
-            if (newHead == nullptr)
-                newHead = cur;
-            prev = cur;
-            cur = cur->next;
-        } else {
-            if (prev)
-                prev->next = cur->next;
-            Node* tmp = cur->next;
-            cur->next = nullptr;
-            tail->next = cur;
-            tail = cur;
-            cur = tmp;
+        if (compareNames(cur->event.getName(), pivot->event.getName())) { 
+            if (lessHead == nullptr) {
+                lessHead = lessTail = cur;
+            } else {
+                lessTail->next = cur;
+                lessTail = cur;
+            }
+        } else { 
+            if (greaterHead == nullptr) {
+                greaterHead = greaterTail = cur;
+            } else {
+                greaterTail->next = cur;
+                greaterTail = cur;
+            }
         }
+        cur = cur->next;
     }
-    
-    if (newHead == nullptr)
+
+
+    if (lessTail) lessTail->next = nullptr;
+    if (greaterTail) greaterTail->next = nullptr;
+
+
+    if (lessHead == nullptr) {
         newHead = pivot;
-    newEnd = tail;
+    } else {
+        newHead = lessHead;
+        lessTail->next = pivot;
+    }
+    pivot->next = greaterHead;
+    newEnd = (greaterTail != nullptr) ? greaterTail : pivot;
+
     return pivot;
 }
 
-Node* EventManager::quickSortRec(Node* currentHead, Node* end) {
-    if (!currentHead || currentHead == end) return currentHead;
-    
+Node* EventManager::quickSortRec(Node* head, Node* end) {
+    if (!head || head == end) return head;
+
     Node* newHead = nullptr;
     Node* newEnd = nullptr;
-    
-    Node* pivot = partition(currentHead, newHead, newEnd);
-    
+
+
+    Node* pivot = partition(head, newHead, newEnd);
+
+
     if (newHead != pivot) {
         Node* tmp = newHead;
-        while (tmp->next != pivot)
+        while (tmp->next != pivot) {
             tmp = tmp->next;
-        tmp->next = nullptr;
-        
-        newHead = quickSortRec(newHead, tmp);
-        
+        }
+        tmp->next = nullptr; 
+        newHead = quickSortRec(newHead, tmp); 
         tmp = getTail(newHead);
-        tmp->next = pivot;
+        tmp->next = pivot; 
     }
-    
-    pivot->next = quickSortRec(pivot->next, newEnd);
-    return newHead;
-}
 
-void EventManager::quickSort(Node*& headRef) {
-    headRef = quickSortRec(headRef, getTail(headRef));
+    pivot->next = quickSortRec(pivot->next, newEnd);
+
+    return newHead;
 }
 
 Node* EventManager::findNode(const std::string& eventID) {
@@ -176,8 +190,6 @@ int EventManager::loadEventsFromFile() {
             token = token.substr(token.find_first_not_of(" \t")); 
             token = token.substr(0, token.find_last_not_of(" \t\n") + 1); 
             bool isApproved = (token == "Approved"); 
-
-            std::cout << "Loading event " << eventID << " | Status token: '" << token << "' | isApproved: " << isApproved << std::endl;
 
             if (!isValidDate(date) || !isValidTime(time)) {
                 std::cout << "Warning: Invalid date/time format in log for event " << eventID << ". Skipping." << std::endl;
@@ -244,7 +256,7 @@ void EventManager::displayMenu() const {
     std::cout << "| 7. Delete Event by ID                |" << std::endl;
     std::cout << "| 8. Exit                              |" << std::endl;
     std::cout << "+=======================================+" << std::endl;
-    std::cout << "Please enter your choice (1-9): ";
+    std::cout << "Please enter your choice (1-8): ";
 }
 
 void EventManager::scheduleEvent(const std::string& eventID, const std::string& name, 
@@ -260,19 +272,16 @@ void EventManager::scheduleEvent(const std::string& eventID, const std::string& 
         current = current->next;
     }
 
-
     if (!isValidDate(date) || !isValidTime(time)) {
         std::cout << "ERROR: Invalid date or time format for event '" << eventID << "'!" << std::endl;
         return;
     }
-
 
     Event newEvent(eventID, name, date, time, organizer, approved);
     Node* newNode = new Node(newEvent);
     newNode->next = head;
     head = newNode;
     eventCount++;
-
 
     logEvent("Added", newEvent);
     std::cout << "\nSUCCESS: Event '" << newEvent.getName() << "' scheduled!" << std::endl;
@@ -295,7 +304,7 @@ void EventManager::sortByName() {
     if (eventCount == 0) {
         std::cout << "ERROR: No events to sort!" << std::endl;
     } else {
-        quickSort(head);
+        head = quickSortRec(head, getTail(head));
         std::cout << "SUCCESS: Events sorted by name!" << std::endl;
         displayEvents();
     }
